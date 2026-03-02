@@ -21,9 +21,58 @@ Pin to a specific version:
 curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash -s v1.0.0
 ```
 
-## Update
+## Keeping up to date
 
-Re-run the install command. It updates the template section of `CLAUDE.md` while preserving your local customizations, and leaves `.docs-config.json` untouched.
+### Option 1: package.json script (recommended)
+
+Add this to your `package.json`:
+
+```json
+{
+  "scripts": {
+    "update-claude": "curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash"
+  }
+}
+```
+
+Then run `pnpm update-claude` whenever you want the latest template.
+
+### Option 2: GitHub Action
+
+Add `.github/workflows/update-claude-md.yml` to auto-update weekly and open a PR:
+
+```yaml
+name: Update CLAUDE.md
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@<sha> # pin to latest
+        with:
+          persist-credentials: false
+      - name: Update CLAUDE.md
+        run: curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash
+      - name: Create PR if changed
+        uses: peter-evans/create-pull-request@<sha> # pin to latest
+        with:
+          commit-message: "Update CLAUDE.md from claude-docs-prompts"
+          title: "Update CLAUDE.md template"
+          branch: update-claude-md
+          delete-branch: true
+```
+
+### Manual
+
+Re-run the install command directly. It updates the template section of `CLAUDE.md` while preserving your local customizations, and leaves `.docs-config.json` untouched.
 
 ## Configuration
 

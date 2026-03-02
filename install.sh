@@ -36,7 +36,7 @@ fi
 
 # Create .docs-config.json only if it doesn't exist
 if [ -f "$CONFIG_FILE" ]; then
-	printf "Skipped %s (already exists)\n" "$CONFIG_FILE"
+	printf "Skipped %s (already exists — edit manually to update values)\n" "$CONFIG_FILE"
 else
 	printf "\nCreating %s — enter repo-specific values:\n\n" "$CONFIG_FILE"
 
@@ -63,7 +63,7 @@ else
 	else
 		printf "GitHub repo (e.g. Cyfrin/docs-main): "
 	fi
-	read -r github_repo
+	read -r github_repo </dev/tty
 	github_repo="${github_repo:-$default_repo}"
 
 	if [ -z "$github_repo" ]; then
@@ -72,11 +72,11 @@ else
 	fi
 
 	printf "GitHub branch [main]: "
-	read -r github_branch
+	read -r github_branch </dev/tty
 	github_branch="${github_branch:-main}"
 
 	printf "Production URL (e.g. https://docs.cyfrin.io): "
-	read -r production_url
+	read -r production_url </dev/tty
 	if [ -z "$production_url" ]; then
 		printf "Error: production_url is required\n" >&2
 		exit 1
@@ -87,11 +87,11 @@ else
 	else
 		printf "Site title: "
 	fi
-	read -r site_title
+	read -r site_title </dev/tty
 	site_title="${site_title:-$default_title}"
 
 	printf "Site description: "
-	read -r site_description
+	read -r site_description </dev/tty
 
 	# Write config
 	cat >"$CONFIG_FILE" <<EOF
