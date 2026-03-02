@@ -68,7 +68,7 @@ A script at `scripts/build-llms-txt.ts` that generates two files in `public/`:
 - **`llms.txt`** — a concise index of all pages with titles and URLs, following the [llms.txt spec](https://llmstxt.org/)
 - **`llms-full.txt`** — the full concatenated content of all pages in plain text
 
-Runs as a prebuild script in `package.json` so the files are always fresh at deploy time. Uses `production_url` from `.docs-config.json` for absolute URLs.
+Runs as a prebuild script in `package.json` so the files are always fresh at deploy time. Uses `production_url` from `.docs-config.json` for absolute URLs, but relative URLs are good too.
 
 ### 6. Search Index Generation
 
