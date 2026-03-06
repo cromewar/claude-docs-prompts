@@ -1,6 +1,6 @@
 # claude-docs-prompts
 
-Shared instructions for Cyfrin documentation sites. Gives AI agents consistent guidance across all docs repos.
+Shared instructions and Claude Skill for documentation sites. Gives AI agents consistent guidance across all docs repos.
 
 # Installation/Quickstart
 
@@ -129,13 +129,13 @@ The legacy install script creates a `.docs-config.json` in your repo:
 }
 ```
 
-| Field | Required | Default |
-|-------|----------|---------|
-| `github_repo` | Yes | Inferred from `git remote` |
-| `github_branch` | No | `main` |
-| `production_url` | Yes | — |
-| `site_title` | No | Inferred from `package.json` name |
-| `site_description` | No | — |
+| Field              | Required | Default                           |
+| ------------------ | -------- | --------------------------------- |
+| `github_repo`      | Yes      | Inferred from `git remote`        |
+| `github_branch`    | No       | `main`                            |
+| `production_url`   | Yes      | —                                 |
+| `site_title`       | No       | Inferred from `package.json` name |
+| `site_description` | No       | —                                 |
 
 Commit this file to version control. It is never overwritten on update.
 
