@@ -1,0 +1,8 @@
+{
+    "name": "claude-docs-prompts",
+    "description": "A plugin to help claude build and maintain Cyfrin documentation sites",
+    "version": "1.0.0",
+    "author": {
+        "name": "Cyfrin"
+    }
+}

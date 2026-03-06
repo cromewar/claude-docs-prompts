@@ -1,10 +1,51 @@
 # claude-docs-prompts
 
-Shared `CLAUDE.md` template for Cyfrin documentation sites. Gives AI agents consistent instructions across all docs repos.
+Shared instructions for Cyfrin documentation sites. Gives AI agents consistent guidance across all docs repos.
 
-## Install
+# Installation/Quickstart
 
-Run this in your docs repo:
+Install the Cyfrin marketplace, then the claude-docs-prompts skill.
+
+```bash
+# Open a claude code terminal, and in the claude prompt run:
+/plugin marketplace add Cyfrin/claude-docs-prompts
+/plugin install claude-docs-prompts@Cyfrin/claude-docs-prompts
+# Press Ctrl+C then run claude again. Or type /exit to quit first.
+/exit
+claude --continue
+```
+
+# What it does
+
+- Consistent docs site structure across all Cyfrin repos
+- Enforces required features (PrevNextNav, PageActions, link checker, llms.txt, search index)
+- Follows Diataxis framework for content organization
+- Technical conventions for MDX, Tailwind CSS, pinned dependencies, and GitHub Actions
+
+# Usage
+
+```
+Build the PrevNextNav component using config/docs.json
+Add the PageActions dropdown to docs pages
+Set up the broken link checker script
+Generate llms.txt and search index
+```
+
+# What the skill covers
+
+- **Project structure** — where to find pages, components, config, and scripts
+- **PrevNextNav** — bottom-of-page navigation driven by `config/docs.json`
+- **PageActions** — dropdown to copy as markdown, open in Claude, open in ChatGPT
+- **Edit this page** — link to the GitHub edit URL
+- **Broken link checker** — `scripts/check-links.ts` + GitHub Action
+- **llms.txt generation** — `scripts/build-llms-txt.ts` as prebuild
+- **Search index** — `scripts/build-search-index.ts` as prebuild
+- **Technical conventions** — MDX, Tailwind, `'use client'`, lucide-react, pinned actions
+- **Content organization** — Diataxis framework (quickstart, tutorials, how-tos, reference, explanation)
+
+# Legacy Install (curl)
+
+The original installation method downloads a `CLAUDE.md` template directly into your repo root via curl.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash
@@ -21,9 +62,9 @@ Pin to a specific version:
 curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash -s v1.0.0
 ```
 
-## Keeping up to date
+## Keeping up to date (legacy)
 
-### Option 1: package.json script (recommended)
+### Option 1: package.json script
 
 Add this to your `package.json`:
 
@@ -74,9 +115,9 @@ jobs:
 
 Re-run the install command directly. It updates the template section of `CLAUDE.md` while preserving your local customizations, and leaves `.docs-config.json` untouched.
 
-## Configuration
+## Configuration (.docs-config.json)
 
-The install script creates a `.docs-config.json` in your repo:
+The legacy install script creates a `.docs-config.json` in your repo:
 
 ```json
 {
@@ -98,20 +139,7 @@ The install script creates a `.docs-config.json` in your repo:
 
 Commit this file to version control. It is never overwritten on update.
 
-## What the template covers
-
-The `CLAUDE.md` tells AI agents how to work with your docs site:
-
-- **Project structure** — where to find pages, components, config, and scripts
-- **PrevNextNav** — bottom-of-page navigation driven by `config/docs.json`
-- **PageActions** — dropdown to copy as markdown, open in Claude, open in ChatGPT
-- **Edit this page** — link to the GitHub edit URL
-- **Broken link checker** — `scripts/check-links.ts` + GitHub Action
-- **llms.txt generation** — `scripts/build-llms-txt.ts` as prebuild
-- **Search index** — `scripts/build-search-index.ts` as prebuild
-- **Technical conventions** — MDX, Tailwind, `'use client'`, lucide-react, pinned actions
-
-## Repo-specific instructions
+## Repo-specific instructions (legacy)
 
 The `CLAUDE.md` has a marker line near the bottom:
 
@@ -120,3 +148,7 @@ The `CLAUDE.md` has a marker line near the bottom:
 ```
 
 Add any repo-specific agent instructions below this marker. When you re-run the install script, everything above the marker gets updated to the latest template, and everything below it is preserved.
+
+# Authors
+
+[Patrick Collins](https://x.com/PatrickAlphaC) and the [Cyfrin](https://www.cyfrin.io/) team.
