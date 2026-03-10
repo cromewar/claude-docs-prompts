@@ -1,22 +1,22 @@
 {
-  "name": "claude-docs-prompts-marketplace",
+  "name": "auto-docs-marketplace",
   "owner": {
     "name": "Cyfrin"
   },
   "metadata": {
-    "description": "Cyfrin documentation site development tools"
+    "description": "Auto-generate documentation sites from any codebase"
   },
   "plugins": [
     {
-      "name": "claude-docs-prompts",
+      "name": "auto-docs",
       "source": "./",
-      "description": "Build and maintain Cyfrin documentation sites with Next.js, MDX, and Tailwind CSS",
-      "version": "1.0.0",
+      "description": "Analyze any codebase and generate a complete documentation site with API reference, guides, and architecture docs. Supports Next.js, Docusaurus, and Astro Starlight.",
+      "version": "2.0.0",
       "author": {
         "name": "Cyfrin"
       },
       "repository": "https://github.com/Cyfrin/claude-docs-prompts",
-      "keywords": ["docs", "documentation", "nextjs", "mdx", "tailwind", "cyfrin"]
+      "keywords": ["docs", "documentation", "auto-docs", "code-analysis", "api-reference", "nextjs", "docusaurus", "astro", "mdx"]
     }
   ]
 }

@@ -7,7 +7,7 @@ RAW_BASE="https://raw.githubusercontent.com/${REPO}/${VERSION}"
 CONFIG_FILE=".docs-config.json"
 CLAUDE_FILE="CLAUDE.md"
 
-printf "Installing claude-docs-prompts (%s)...\n\n" "$VERSION"
+printf "Installing auto-docs (%s)...\n\n" "$VERSION"
 
 MARKER="<!-- LOCAL CUSTOMIZATIONS — everything below this line is preserved on update -->"
 
@@ -38,7 +38,7 @@ fi
 if [ -f "$CONFIG_FILE" ]; then
 	printf "Skipped %s (already exists — edit manually to update values)\n" "$CONFIG_FILE"
 else
-	printf "\nCreating %s — enter repo-specific values:\n\n" "$CONFIG_FILE"
+	printf "\nCreating %s — enter project-specific values:\n\n" "$CONFIG_FILE"
 
 	# Infer defaults where possible
 	default_repo=""
@@ -61,7 +61,7 @@ else
 	if [ -n "$default_repo" ]; then
 		printf "GitHub repo [%s]: " "$default_repo"
 	else
-		printf "GitHub repo (e.g. Cyfrin/docs-main): "
+		printf "GitHub repo (e.g. yourorg/yourproject): "
 	fi
 	read -r github_repo </dev/tty
 	github_repo="${github_repo:-$default_repo}"
@@ -75,7 +75,7 @@ else
 	read -r github_branch </dev/tty
 	github_branch="${github_branch:-main}"
 
-	printf "Production URL (e.g. https://docs.cyfrin.io): "
+	printf "Production URL (e.g. https://docs.yourproject.com): "
 	read -r production_url </dev/tty
 	if [ -z "$production_url" ]; then
 		printf "Error: production_url is required\n" >&2
@@ -93,6 +93,18 @@ else
 	printf "Site description: "
 	read -r site_description </dev/tty
 
+	printf "Project type (library/cli/webapp/api/other) [library]: "
+	read -r project_type </dev/tty
+	project_type="${project_type:-library}"
+
+	printf "Docs framework (nextjs/docusaurus/astro) [nextjs]: "
+	read -r docs_framework </dev/tty
+	docs_framework="${docs_framework:-nextjs}"
+
+	printf "Docs directory [docs]: "
+	read -r docs_dir </dev/tty
+	docs_dir="${docs_dir:-docs}"
+
 	# Write config
 	cat >"$CONFIG_FILE" <<EOF
 {
@@ -100,7 +112,10 @@ else
   "github_branch": "${github_branch}",
   "production_url": "${production_url}",
   "site_title": "${site_title}",
-  "site_description": "${site_description}"
+  "site_description": "${site_description}",
+  "project_type": "${project_type}",
+  "docs_framework": "${docs_framework}",
+  "docs_dir": "${docs_dir}"
 }
 EOF
 
@@ -108,4 +123,4 @@ EOF
 fi
 
 printf "\nDone! Add %s to version control.\n" "$CONFIG_FILE"
-printf "Add repo-specific instructions below the LOCAL CUSTOMIZATIONS marker in CLAUDE.md\n"
+printf "Add project-specific instructions below the LOCAL CUSTOMIZATIONS marker in CLAUDE.md\n"

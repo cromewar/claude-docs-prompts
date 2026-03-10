@@ -1,7 +1,7 @@
 {
-    "name": "claude-docs-prompts",
-    "description": "A plugin to help claude build and maintain Cyfrin documentation sites",
-    "version": "1.0.0",
+    "name": "auto-docs",
+    "description": "Analyze any codebase and auto-generate a complete documentation site in a docs/ subfolder",
+    "version": "2.0.0",
     "author": {
         "name": "Cyfrin"
     }

@@ -1,72 +1,106 @@
-# claude-docs-prompts
+# auto-docs
 
-Shared instructions and Claude Skill for documentation sites. Gives AI agents consistent guidance across all docs repos.
+Generate complete documentation sites from any codebase. A Claude Code plugin that analyzes your project's source code and creates a full docs site with API reference, architecture guides, and how-tos — all derived from the actual code.
 
-# Installation/Quickstart
+## What it does
 
-Install the Cyfrin marketplace, then the claude-docs-prompts skill.
+- Analyzes any codebase (TypeScript, Python, Rust, Go, Java, Ruby, PHP, C#, C/C++, Swift, and more)
+- Generates a complete documentation site inside a `docs/` subfolder
+- Documents project features, architecture, APIs, configuration, and usage
+- Supports three docs frameworks: **Next.js/MDX**, **Docusaurus**, and **Astro Starlight**
+- Creates build scripts for link checking, llms.txt generation, and search indexing
+
+## Installation
+
+Install via the Claude Code plugin marketplace:
 
 ```bash
-# Open a claude code terminal, and in the claude prompt run:
+# In a Claude Code terminal, run:
 /plugin marketplace add Cyfrin/claude-docs-prompts
-/plugin install claude-docs-prompts@Cyfrin/claude-docs-prompts
-# Press Ctrl+C then run claude again. Or type /exit to quit first.
+/plugin install auto-docs@Cyfrin/claude-docs-prompts
+# Restart Claude Code
 /exit
 claude --continue
 ```
 
-# What it does
+## How it works
 
-- Consistent docs site structure across all Cyfrin repos
-- Enforces required features (PrevNextNav, PageActions, link checker, llms.txt, search index)
-- Follows Diataxis framework for content organization
-- Technical conventions for MDX, Tailwind CSS, pinned dependencies, and GitHub Actions
+The plugin gives Claude Code a seven-phase playbook:
 
-# Usage
+1. **Project Discovery** — detects language, framework, project type, and existing docs
+2. **Codebase Analysis** — maps directory structure, catalogs public APIs, reads tests and docstrings
+3. **Documentation Planning** — creates a docs outline using the Diataxis framework
+4. **Framework Scaffolding** — sets up the chosen docs framework (Next.js, Docusaurus, or Astro Starlight)
+5. **Content Generation** — writes MDX pages with content derived from actual code
+6. **Site Features** — adds PageActions dropdown, Edit This Page links, link checker, llms.txt, and search
+7. **Verification** — builds the site and validates links
 
+## Supported project types
+
+The plugin adapts its documentation strategy based on what it finds:
+
+| Project Type | Emphasis |
+|---|---|
+| Library | API reference, installation, quickstart examples |
+| CLI | Command reference, configuration, common workflows |
+| Web app / API | Architecture overview, endpoints, deployment guide |
+| Monorepo | Per-package docs, workspace structure |
+
+## Docs frameworks
+
+| Framework | Best for | Built-in features used |
+|---|---|---|
+| **Next.js/MDX** (default) | Full customization, custom components | — (all features built from scratch) |
+| **Docusaurus** | React ecosystem, easy setup | Sidebar navigation, search |
+| **Astro Starlight** | Lightweight, fast, docs-focused | Sidebar navigation, search |
+
+Set your preference in `.docs-config.json` or when prompted during install.
+
+## Configuration (.docs-config.json)
+
+```json
+{
+  "github_repo": "yourorg/yourproject",
+  "github_branch": "main",
+  "production_url": "https://docs.yourproject.com",
+  "site_title": "YourProject Docs",
+  "site_description": "Documentation for YourProject",
+  "project_type": "library",
+  "docs_framework": "nextjs",
+  "docs_dir": "docs"
+}
 ```
-Build the PrevNextNav component using config/docs.json
-Add the PageActions dropdown to docs pages
-Set up the broken link checker script
-Generate llms.txt and search index
-```
 
-# What the skill covers
+| Field | Required | Default |
+|---|---|---|
+| `github_repo` | Yes | Inferred from `git remote` |
+| `github_branch` | No | `main` |
+| `production_url` | Yes | — |
+| `site_title` | No | Inferred from `package.json` name |
+| `site_description` | No | — |
+| `project_type` | No | `library` |
+| `docs_framework` | No | `nextjs` |
+| `docs_dir` | No | `docs` |
 
-- **Project structure** — where to find pages, components, config, and scripts
-- **PrevNextNav** — bottom-of-page navigation driven by `config/docs.json`
-- **PageActions** — dropdown to copy as markdown, open in Claude, open in ChatGPT
-- **Edit this page** — link to the GitHub edit URL
-- **Broken link checker** — `scripts/check-links.ts` + GitHub Action
-- **llms.txt generation** — `scripts/build-llms-txt.ts` as prebuild
-- **Search index** — `scripts/build-search-index.ts` as prebuild
-- **Technical conventions** — MDX, Tailwind, `'use client'`, lucide-react, pinned actions
-- **Content organization** — Diataxis framework (quickstart, tutorials, how-tos, reference, explanation)
+Commit this file to version control. It is never overwritten on update.
 
-# Legacy Install (curl)
+## Legacy install (curl)
 
-The original installation method downloads a `CLAUDE.md` template directly into your repo root via curl.
+Download the `CLAUDE.md` template directly into your repo root:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash
 ```
 
-This does two things:
-
-1. **Downloads `CLAUDE.md`** into your repo root (updates the template portion, preserves your customizations)
-2. **Creates `.docs-config.json`** if it doesn't exist — prompts you for repo-specific values
-
 Pin to a specific version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash -s v1.0.0
+curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash -s v2.0.0
 ```
 
-## Keeping up to date (legacy)
+### Keeping up to date
 
-### Option 1: package.json script
-
-Add this to your `package.json`:
+Add to your `package.json`:
 
 ```json
 {
@@ -76,17 +110,13 @@ Add this to your `package.json`:
 }
 ```
 
-Then run `pnpm update-claude` whenever you want the latest template.
-
-### Option 2: GitHub Action
-
-Add `.github/workflows/update-claude-md.yml` to auto-update weekly and open a PR:
+Or set up a GitHub Action to auto-update weekly:
 
 ```yaml
 name: Update CLAUDE.md
 on:
   schedule:
-    - cron: "0 9 * * 1" # Every Monday at 9am UTC
+    - cron: "0 9 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -105,41 +135,13 @@ jobs:
       - name: Create PR if changed
         uses: peter-evans/create-pull-request@<sha> # pin to latest
         with:
-          commit-message: "Update CLAUDE.md from claude-docs-prompts"
+          commit-message: "Update CLAUDE.md from auto-docs"
           title: "Update CLAUDE.md template"
           branch: update-claude-md
           delete-branch: true
 ```
 
-### Manual
-
-Re-run the install command directly. It updates the template section of `CLAUDE.md` while preserving your local customizations, and leaves `.docs-config.json` untouched.
-
-## Configuration (.docs-config.json)
-
-The legacy install script creates a `.docs-config.json` in your repo:
-
-```json
-{
-  "github_repo": "Cyfrin/docs-main",
-  "github_branch": "main",
-  "production_url": "https://docs.cyfrin.io",
-  "site_title": "Cyfrin Docs",
-  "site_description": "Documentation for Cyfrin"
-}
-```
-
-| Field              | Required | Default                           |
-| ------------------ | -------- | --------------------------------- |
-| `github_repo`      | Yes      | Inferred from `git remote`        |
-| `github_branch`    | No       | `main`                            |
-| `production_url`   | Yes      | —                                 |
-| `site_title`       | No       | Inferred from `package.json` name |
-| `site_description` | No       | —                                 |
-
-Commit this file to version control. It is never overwritten on update.
-
-## Repo-specific instructions (legacy)
+## Customization
 
 The `CLAUDE.md` has a marker line near the bottom:
 
@@ -147,8 +149,8 @@ The `CLAUDE.md` has a marker line near the bottom:
 <!-- LOCAL CUSTOMIZATIONS — everything below this line is preserved on update -->
 ```
 
-Add any repo-specific agent instructions below this marker. When you re-run the install script, everything above the marker gets updated to the latest template, and everything below it is preserved.
+Add any project-specific agent instructions below this marker. Re-running the install script updates everything above the marker and preserves everything below it.
 
-# Authors
+## Authors
 
 [Patrick Collins](https://x.com/PatrickAlphaC) and the [Cyfrin](https://www.cyfrin.io/) team.
