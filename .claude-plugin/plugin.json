@@ -3,6 +3,6 @@
     "description": "Analyze any codebase and auto-generate a complete documentation site in a docs/ subfolder",
     "version": "2.0.0",
     "author": {
-        "name": "Cyfrin"
+        "name": "cromewar"
     }
 }

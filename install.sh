@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO="Cyfrin/claude-docs-prompts"
+REPO="cromewar/claude-docs-prompts"
 VERSION="${1:-main}"
 RAW_BASE="https://raw.githubusercontent.com/${REPO}/${VERSION}"
 CONFIG_FILE=".docs-config.json"

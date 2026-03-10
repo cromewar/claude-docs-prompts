@@ -16,8 +16,8 @@ Install via the Claude Code plugin marketplace:
 
 ```bash
 # In a Claude Code terminal, run:
-/plugin marketplace add Cyfrin/claude-docs-prompts
-/plugin install auto-docs@Cyfrin/claude-docs-prompts
+/plugin marketplace add cromewar/claude-docs-prompts
+/plugin install auto-docs@cromewar/claude-docs-prompts
 # Restart Claude Code
 /exit
 claude --continue
@@ -89,13 +89,13 @@ Commit this file to version control. It is never overwritten on update.
 Download the `CLAUDE.md` template directly into your repo root:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/cromewar/claude-docs-prompts/main/install.sh | bash
 ```
 
 Pin to a specific version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash -s v2.0.0
+curl -fsSL https://raw.githubusercontent.com/cromewar/claude-docs-prompts/main/install.sh | bash -s v2.0.0
 ```
 
 ### Keeping up to date
@@ -105,7 +105,7 @@ Add to your `package.json`:
 ```json
 {
   "scripts": {
-    "update-claude": "curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash"
+    "update-claude": "curl -fsSL https://raw.githubusercontent.com/cromewar/claude-docs-prompts/main/install.sh | bash"
   }
 }
 ```
@@ -131,7 +131,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Update CLAUDE.md
-        run: curl -fsSL https://raw.githubusercontent.com/Cyfrin/claude-docs-prompts/main/install.sh | bash
+        run: curl -fsSL https://raw.githubusercontent.com/cromewar/claude-docs-prompts/main/install.sh | bash
       - name: Create PR if changed
         uses: peter-evans/create-pull-request@<sha> # pin to latest
         with:
@@ -153,4 +153,4 @@ Add any project-specific agent instructions below this marker. Re-running the in
 
 ## Authors
 
-[Patrick Collins](https://x.com/PatrickAlphaC) and the [Cyfrin](https://www.cyfrin.io/) team.
+[cromewar](https://github.com/cromewar)

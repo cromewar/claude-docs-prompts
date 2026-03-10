@@ -1,7 +1,7 @@
 {
   "name": "auto-docs-marketplace",
   "owner": {
-    "name": "Cyfrin"
+    "name": "cromewar"
   },
   "metadata": {
     "description": "Auto-generate documentation sites from any codebase"
@@ -13,9 +13,9 @@
       "description": "Analyze any codebase and generate a complete documentation site with API reference, guides, and architecture docs. Supports Next.js, Docusaurus, and Astro Starlight.",
       "version": "2.0.0",
       "author": {
-        "name": "Cyfrin"
+        "name": "cromewar"
       },
-      "repository": "https://github.com/Cyfrin/claude-docs-prompts",
+      "repository": "https://github.com/cromewar/claude-docs-prompts",
       "keywords": ["docs", "documentation", "auto-docs", "code-analysis", "api-reference", "nextjs", "docusaurus", "astro", "mdx"]
     }
   ]
