@@ -128,6 +128,7 @@ docs/
 ```
 
 **Technical conventions for Next.js:**
+
 - Tailwind CSS utility classes. No custom CSS unless necessary.
 - `'use client'` directive only on components using browser APIs, event handlers, or hooks (`useState`, `useEffect`). Server components are the default.
 - `lucide-react` for all icons.
@@ -169,12 +170,14 @@ docs/
 ```
 
 **Key dependencies** (pin exact versions):
+
 - `fumadocs-ui` — theme, layouts (`DocsLayout`, `HomeLayout`), UI components, search dialog, `RootProvider`
 - `fumadocs-core` — Loader API (`loader()`), search server (`createFromSource`), page tree types
 - `fumadocs-mdx` — content source (`defineDocs`, `defineConfig`, `createMDX` Next.js plugin)
 - `@types/mdx` — TypeScript MDX type definitions
 
 **Technical conventions for Fumadocs:**
+
 - **Content source config** — `source.config.ts` at project root defines collections with `defineDocs({ dir: 'content/docs' })` and exports `defineConfig()` as default.
 - **Loader API** — `lib/source.ts` creates the source object: `loader({ baseUrl: '/docs', source: docs.toFumadocsSource() })`. This generates the page tree, provides `getPage()`, `getPages()`, `generateParams()`.
 - **Root layout** — must wrap children with `<RootProvider>` from `fumadocs-ui/provider/next` inside `<html>` and `<body>`. Handles theme (next-themes) and search context.
@@ -209,6 +212,7 @@ docs/
 ```
 
 **Docusaurus notes:**
+
 - Uses built-in sidebar navigation — do not create a custom PrevNextNav component.
 - Uses built-in search plugin (e.g., `@docusaurus/plugin-search-local` or Algolia) — do not create a custom search index script.
 - Sidebar is auto-generated from folder structure or manually defined in `sidebars.ts`.
@@ -232,6 +236,7 @@ docs/
 ```
 
 **Astro Starlight notes:**
+
 - Uses built-in sidebar navigation configured in `astro.config.mjs` — do not create a custom PrevNextNav component.
 - Uses built-in search — do not create a custom search index script.
 - Content pages use Markdown frontmatter for titles and ordering.
@@ -252,15 +257,15 @@ docs/
 
 Generate these pages (paths adapt per framework):
 
-| Page | Content Source |
-|------|---------------|
-| **Overview / index** | README + code analysis: what the project is, what problem it solves, key features |
-| **Installation** | Package manager files, README setup sections, prerequisites |
-| **Quickstart** | Tests, examples folder, README — minimal working example |
-| **Architecture** | Directory structure analysis, module relationships, architectural patterns |
-| **API Reference** (per module) | Exported symbols, docstrings, type signatures, parameters |
-| **Guides / How-tos** | Test files, example files, README sections — task-oriented walkthroughs |
-| **Configuration** | Environment variables, config files, CLI arguments, feature flags |
+| Page                           | Content Source                                                                    |
+| ------------------------------ | --------------------------------------------------------------------------------- |
+| **Overview / index**           | README + code analysis: what the project is, what problem it solves, key features |
+| **Installation**               | Package manager files, README setup sections, prerequisites                       |
+| **Quickstart**                 | Tests, examples folder, README — minimal working example                          |
+| **Architecture**               | Directory structure analysis, module relationships, architectural patterns        |
+| **API Reference** (per module) | Exported symbols, docstrings, type signatures, parameters                         |
+| **Guides / How-tos**           | Test files, example files, README sections — task-oriented walkthroughs           |
+| **Configuration**              | Environment variables, config files, CLI arguments, feature flags                 |
 
 Skip any section that has no meaningful content to derive from the codebase. A missing section is better than a section full of placeholders.
 
@@ -277,9 +282,11 @@ Create these features in the generated docs site. Some are framework-specific.
    - **Open in Claude** — opens `https://claude.ai/new?q=` with an encoded prompt asking Claude to read the page, using the page's production URL from `.docs-config.json`
 
 2. **Edit This Page** — a link on every page that opens the GitHub edit URL:
+
    ```
    https://github.com/{github_repo}/edit/{github_branch}/{docs_dir}/content/{path-to-file}
    ```
+
    Adjust the path pattern based on the framework's content directory structure.
 
 3. **Broken Link Checker** — `scripts/check-links.ts`:
@@ -318,12 +325,14 @@ Create these features in the generated docs site. Some are framework-specific.
 Features 6 and 7 are **not needed** — Fumadocs provides built-in sidebar navigation (via `DocsLayout` + page tree) and built-in search (via Orama + `createFromSource`). Use the framework defaults.
 
 8. **Search API Route** — create `app/api/search/route.ts`:
+
    ```ts
-   import { source } from '@/lib/source';
-   import { createFromSource } from 'fumadocs-core/search/server';
+   import { source } from "@/lib/source";
+   import { createFromSource } from "fumadocs-core/search/server";
 
    export const { GET } = createFromSource(source);
    ```
+
    This is the only search setup needed — Fumadocs UI's search dialog connects to it automatically.
 
 9. **Edit This Page** — Fumadocs does not include a built-in "Edit on GitHub" link. Create the `EditThisPage` component or add an edit link to each page template using the pattern:
