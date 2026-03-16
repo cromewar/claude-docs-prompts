@@ -1,5 +1,5 @@
 ---
-description: Analyze any codebase and auto-generate a documentation site. Supports Next.js, Docusaurus, and Astro Starlight. Use when the user wants to generate docs from their code.
+description: Analyze any codebase and auto-generate a documentation site. Supports Next.js, Fumadocs, Docusaurus, and Astro Starlight. Use when the user wants to generate docs from their code.
 disable-model-invocation: true
 ---
 
@@ -88,7 +88,7 @@ Based on your analysis, plan the documentation structure.
 
 ## Phase 4: Framework Selection & Scaffolding
 
-Read `docs_framework` from `.docs-config.json` (default: `"nextjs"`). Supported values: `"nextjs"`, `"docusaurus"`, `"astro"`.
+Read `docs_framework` from `.docs-config.json` (default: `"nextjs"`). Supported values: `"nextjs"`, `"fumadocs"`, `"docusaurus"`, `"astro"`.
 
 Create the docs site inside the configured `docs_dir` (default: `docs/`). If the directory already exists, update it rather than overwriting — preserve any manual edits.
 
@@ -132,6 +132,62 @@ docs/
 - `'use client'` directive only on components using browser APIs, event handlers, or hooks (`useState`, `useEffect`). Server components are the default.
 - `lucide-react` for all icons.
 - Pin exact dependency versions in `package.json` (no `^` or `~`).
+
+### Fumadocs
+
+Fumadocs is a Next.js-native documentation framework built on the App Router, Fumadocs MDX (a type-safe content source), and Fumadocs UI (a theme with built-in navigation, search, and dark mode). It uses a `source.config.ts` file to define content collections and a `lib/source.ts` file to create the Loader API that generates the page tree and provides page utilities.
+
+```
+docs/
+  app/
+    layout.tsx            Root layout with RootProvider from fumadocs-ui/provider/next
+    global.css            Tailwind CSS v4 + Fumadocs preset imports
+    docs/
+      layout.tsx          DocsLayout with sidebar, page tree from source.getPageTree()
+      [[...slug]]/
+        page.tsx           Dynamic route rendering MDX content via source.getPage()
+    api/
+      search/
+        route.ts          Orama search endpoint: createFromSource(source)
+  content/
+    docs/                  MDX documentation pages organized by section
+      meta.json            Folder ordering and sidebar customization per folder
+  components/
+    PageActions.tsx         Dropdown: copy markdown, view raw, open in ChatGPT/Claude
+    mdx.tsx                Custom MDX component overrides (imports defaultMdxComponents from fumadocs-ui/mdx)
+  lib/
+    source.ts              Loader API: loader() with docs.toFumadocsSource() + baseUrl
+    layout.shared.ts       Shared BaseLayoutProps (nav title, links, githubUrl)
+  scripts/
+    check-links.ts         Broken link validation
+    build-llms-txt.ts      Generate llms.txt and llms-full.txt
+  public/                  Static assets + generated files (llms.txt)
+  source.config.ts         Fumadocs MDX config: defineDocs() + defineConfig()
+  next.config.mjs          Wrapped with createMDX() from fumadocs-mdx/next
+  package.json
+  tsconfig.json
+```
+
+**Key dependencies** (pin exact versions):
+- `fumadocs-ui` — theme, layouts (`DocsLayout`, `HomeLayout`), UI components, search dialog, `RootProvider`
+- `fumadocs-core` — Loader API (`loader()`), search server (`createFromSource`), page tree types
+- `fumadocs-mdx` — content source (`defineDocs`, `defineConfig`, `createMDX` Next.js plugin)
+- `@types/mdx` — TypeScript MDX type definitions
+
+**Technical conventions for Fumadocs:**
+- **Content source config** — `source.config.ts` at project root defines collections with `defineDocs({ dir: 'content/docs' })` and exports `defineConfig()` as default.
+- **Loader API** — `lib/source.ts` creates the source object: `loader({ baseUrl: '/docs', source: docs.toFumadocsSource() })`. This generates the page tree, provides `getPage()`, `getPages()`, `generateParams()`.
+- **Root layout** — must wrap children with `<RootProvider>` from `fumadocs-ui/provider/next` inside `<html>` and `<body>`. Handles theme (next-themes) and search context.
+- **Docs layout** — uses `<DocsLayout {...baseOptions()} tree={source.getPageTree()}>` from `fumadocs-ui/layouts/docs`. Sidebar navigation is derived automatically from the page tree — do not create a custom sidebar component.
+- **Page route** — `app/docs/[[...slug]]/page.tsx` uses `source.getPage(slugs)` to get page data, then renders `<page.data.body components={mdxComponents} />`. Export `generateStaticParams` using `source.generateParams()`.
+- **Sidebar ordering** — controlled via `meta.json` files in content folders with a `pages` array (e.g., `["index", "getting-started", "---Guides---", "..."]`). Supports separators (`---Label---`), links (`[Text](url)`), rest items (`...`), and exclusions (`!item`).
+- **Search** — built-in via Orama. Create an API route at `app/api/search/route.ts` that exports `const { GET } = createFromSource(source)` from `fumadocs-core/search/server`. No custom search index script needed.
+- **Styling** — Tailwind CSS v4 with Fumadocs presets. Global CSS imports: `@import 'tailwindcss'`, `@import 'fumadocs-ui/css/neutral.css'` (or another color preset), `@import 'fumadocs-ui/css/preset.css'`.
+- **MDX components** — import `defaultMdxComponents` from `fumadocs-ui/mdx` and spread them into your custom components map. Includes Cards, Callouts, Code Blocks, and Headings.
+- **Frontmatter** — pages use `title`, `description`, and optionally `icon` in frontmatter. Schema is extensible via Zod in `source.config.ts`.
+- **Generated output** — Fumadocs MDX generates a `.source/` directory on `next dev` or `next build`. Add `.source/` to `.gitignore`. Set up a tsconfig path alias: `"collections/*": [".source/*"]`.
+- `'use client'` directive only on components using browser APIs, event handlers, or hooks. Server components are the default.
+- `lucide-react` for all icons (also used by Fumadocs for page tree icons via the `icon` handler in `loader()`).
 
 ### Docusaurus
 
@@ -256,6 +312,24 @@ Create these features in the generated docs site. Some are framework-specific.
    - Builds a JSON client-side search index from content
    - Indexes titles, headings, and body text
    - Runs as a prebuild script
+
+### Fumadocs
+
+Features 6 and 7 are **not needed** — Fumadocs provides built-in sidebar navigation (via `DocsLayout` + page tree) and built-in search (via Orama + `createFromSource`). Use the framework defaults.
+
+8. **Search API Route** — create `app/api/search/route.ts`:
+   ```ts
+   import { source } from '@/lib/source';
+   import { createFromSource } from 'fumadocs-core/search/server';
+
+   export const { GET } = createFromSource(source);
+   ```
+   This is the only search setup needed — Fumadocs UI's search dialog connects to it automatically.
+
+9. **Edit This Page** — Fumadocs does not include a built-in "Edit on GitHub" link. Create the `EditThisPage` component or add an edit link to each page template using the pattern:
+   ```
+   https://github.com/{github_repo}/edit/{github_branch}/{docs_dir}/content/docs/{path-to-file}
+   ```
 
 ### Docusaurus & Astro Starlight
 
