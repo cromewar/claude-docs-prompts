@@ -183,7 +183,7 @@ docs/
 - **Root layout** — must wrap children with `<RootProvider>` from `fumadocs-ui/provider/next` inside `<html>` and `<body>`. Handles theme (next-themes) and search context.
 - **Docs layout** — uses `<DocsLayout {...baseOptions()} tree={source.getPageTree()}>` from `fumadocs-ui/layouts/docs`. Sidebar navigation is derived automatically from the page tree — do not create a custom sidebar component.
 - **Page route** — `app/docs/[[...slug]]/page.tsx` uses `source.getPage(slugs)` to get page data, then renders `<page.data.body components={mdxComponents} />`. Export `generateStaticParams` using `source.generateParams()`.
-- **Sidebar ordering** — controlled via `meta.json` files in content folders with a `pages` array (e.g., `["index", "getting-started", "---Guides---", "..."]`). Supports separators (`---Label---`), links (`[Text](url)`), rest items (`...`), and exclusions (`!item`).
+- **Sidebar ordering & page navigation** — controlled via `meta.json` files in content folders with a `pages` array (e.g., `["index", "getting-started", "---Guides---", "..."]`). Supports separators (`---Label---`), links (`[Text](url)`), rest items (`...`), and exclusions (`!item`). **Every content subfolder must have a `meta.json`** — without it, pages appear in filesystem order and prev/next navigation will be incorrect. The `pages` array order determines both sidebar display and prev/next footer link sequence.
 - **Search** — built-in via Orama. Create an API route at `app/api/search/route.ts` that exports `const { GET } = createFromSource(source)` from `fumadocs-core/search/server`. No custom search index script needed.
 - **Styling** — Tailwind CSS v4 with Fumadocs presets. Global CSS imports: `@import 'tailwindcss'`, `@import 'fumadocs-ui/css/neutral.css'` (or another color preset), `@import 'fumadocs-ui/css/preset.css'`.
 - **MDX components** — import `defaultMdxComponents` from `fumadocs-ui/mdx` and spread them into your custom components map. Includes Cards, Callouts, Code Blocks, and Headings.
@@ -322,7 +322,58 @@ Create these features in the generated docs site. Some are framework-specific.
 
 ### Fumadocs
 
-Features 6 and 7 are **not needed** — Fumadocs provides built-in sidebar navigation (via `DocsLayout` + page tree) and built-in search (via Orama + `createFromSource`). Use the framework defaults.
+Features 6 and 7 are **not needed** — Fumadocs provides built-in sidebar navigation (via `DocsLayout` + page tree), built-in prev/next page links (footer navigation), and built-in search (via Orama + `createFromSource`). Use the framework defaults.
+
+**However**, Fumadocs prev/next navigation and sidebar ordering **only work correctly when `meta.json` files are present** in every content subfolder. Without `meta.json`, pages appear in alphabetical/filesystem order and prev/next links may skip pages or navigate in an unexpected sequence.
+
+6. **Page Navigation via `meta.json`** — create a `meta.json` file in **every content subfolder** (including the root `content/docs/` folder) to define the page order. This controls both the sidebar order and the prev/next footer links.
+
+   **Root `content/docs/meta.json`** — defines top-level section order:
+   ```json
+   {
+     "title": "Docs",
+     "pages": [
+       "index",
+       "getting-started",
+       "---Guides---",
+       "guides",
+       "---Reference---",
+       "api-reference",
+       "configuration",
+       "architecture"
+     ]
+   }
+   ```
+
+   **Subfolder `content/docs/guides/meta.json`** — defines page order within a section:
+   ```json
+   {
+     "title": "Guides",
+     "pages": [
+       "index",
+       "quickstart",
+       "authentication",
+       "deployment",
+       "..."
+     ]
+   }
+   ```
+
+   **`meta.json` rules:**
+   - Every folder with MDX files **must** have a `meta.json` with a `pages` array
+   - List page filenames **without** the `.mdx` extension
+   - Use `"---Label---"` for sidebar section separators
+   - Use `"..."` (rest operator) to include any unlisted pages at that position
+   - Use `"!page-name"` to exclude a page from navigation
+   - Use `"[Link Text](url)"` for external links in the sidebar
+   - The order in the `pages` array determines both sidebar display order and prev/next navigation sequence
+   - If a folder has subfolders, list the subfolder name in `pages` to position it in the nav tree
+
+7. **Navigation verification** — after generating content, verify that:
+   - Every content subfolder has a `meta.json` file
+   - The `pages` array in each `meta.json` lists all pages in the intended reading order
+   - No pages are missing from `meta.json` (unlisted pages won't appear in navigation)
+   - The prev/next sequence follows a logical reading path through the documentation
 
 8. **Search API Route** — create `app/api/search/route.ts`:
 
@@ -351,7 +402,7 @@ After generating the docs site:
 1. Run `pnpm install` (or `npm install`) inside the docs directory.
 2. Run `pnpm build` to verify the site compiles without errors.
 3. Run the link checker to ensure no broken internal links.
-4. Verify the navigation tree/sidebar matches the actual content files.
+4. Verify the navigation tree/sidebar matches the actual content files. For Fumadocs, verify that every content subfolder has a `meta.json` with a `pages` array listing all pages in the correct reading order.
 5. Spot-check that API reference pages match the actual exported symbols.
 
 ## Content Organization (Diataxis)
